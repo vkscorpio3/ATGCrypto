@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+ATG-Product: SPARKRED.CRYPTO
+ATG-Config-Path: config/
+ATG-Required: 
+ATG-Client-Class-Path: classes/ lib/commons-codec-1.1.jar lib/commons-lang-2.1.jar lib/jasypt-1.6.jar lib/icu4j-4.4.jar
+ATG-Client-Update-File: true
+ATG-Class-Path: classes/ lib/commons-codec-1.1.jar lib/commons-lang-2.1.jar lib/jasypt-1.6.jar lib/icu4j-4.4.jar
+ATG-EAR-Module: 

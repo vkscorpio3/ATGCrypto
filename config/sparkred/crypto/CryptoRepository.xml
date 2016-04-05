@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE gsa-template PUBLIC "-//Art Technology Group, Inc.//DTD General SQL Adapter//EN" "http://www.atg.com/dtds/gsa/gsa_1.0.dtd">
+<gsa-template>
+	<header>
+		<name>Sparkred Crypto Repository</name>
+		<author>Devon Hillard</author>
+	</header>
+	<item-descriptor name="cryptoEngine" content="false"
+		folder="false" use-id-for-path="false" hidden="false" expert="false"
+		writable="true" cache-mode="disabled" query-cache-size="10"
+		id-separator=":">
+		<table name="SR_CRYPTO" type="primary" id-column-names="id">
+			<property name="encDataKey" column-name="ENC_DATA_KEY"
+				data-type="string" required="false" readable="true" writable="true"
+				queryable="true" hidden="false" expert="false" cache-mode="inherit" />
+			<property name="description" column-name="DESCRIPTION"
+				data-type="string" required="false" readable="true" writable="true"
+				queryable="true" hidden="false" expert="false" cache-mode="inherit" />
+			<property name="keyDate" column-name="KEY_DATE" data-type="date"
+				required="false" readable="true" writable="true" queryable="true"
+				hidden="false" expert="false" cache-mode="inherit" />
+		</table>
+	</item-descriptor>
+
+</gsa-template>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE gsa-template SYSTEM "dynamosystemresource:/atg/dtds/gsa/gsa_1.0.dtd">
+
+<gsa-template>
+
+	<item-descriptor name="creditCard">
+		<table type="auxiliary" id-column-name="payment_group_id"
+			shared-table-sequence="1" name="dcspp_credit_card">
+			<property expert="false" display-name-resource="creditCardNumber" readable="true" writable="true"
+	category-resource="categoryCreditCard" required="false" hidden="false" column-name="credit_card_number" cache-mode="inherit"
+	data-type="string" name="creditCardNumber" queryable="true" property-type="com.sparkred.crypto.CryptoPropertyDescriptor"
+	xml-combine="replace">
+				<attribute name="cryptoEngine" value="/sparkred/crypto/CreditCardCryptoEngine" />
+				<attribute name="encryptOnly" value="false" />
+			</property>
+		</table>
+	</item-descriptor>
+
+</gsa-template>

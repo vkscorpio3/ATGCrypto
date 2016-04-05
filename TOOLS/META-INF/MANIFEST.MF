@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+ATG-Product: SPARKRED.CRYPTO.TOOLS
+ATG-Config-Path: config/
+ATG-Required: SPARKRED.CRYPTO
+ATG-Client-Class-Path: classes/
+ATG-Client-Update-File: true
+ATG-Class-Path: classes/
+ATG-EAR-Module: 

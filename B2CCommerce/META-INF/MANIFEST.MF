@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+ATG-Product: SPARKRED.CRYPTO.B2CCommerce
+ATG-Config-Path: config/
+ATG-Required: SPARKRED.CRYPTO B2CCommerce
+ATG-EAR-Module: 

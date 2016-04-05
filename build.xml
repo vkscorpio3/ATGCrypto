@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Sparkred Crypto" default="build-all-modules" basedir=".">
+	<property environment="env" />
+	<property name="global.dir" value="." />
+	<property file="${user.name}.properties" />
+	<property file="build.properties" />
+
+	<!-- Define an if and else task for use in this definition -->
+	<taskdef name="if" classname="ise.antelope.tasks.IfTask" classpath="build-lib/atg-ant.jar" />
+	<taskdef name="else" classname="ise.antelope.tasks.ElseTask" classpath="build-lib/atg-ant.jar" />
+
+	<!-- The classpath for the project. -->
+	<path id="lib.classpath">
+		<fileset dir="lib">
+			<include name="**/*.jar" />
+			<include name="**/*.zip" />
+		</fileset>
+		<fileset dir="jboss/modules">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- The classpath for build libraries -->
+	<path id="buildlib.classpath">
+		<fileset dir="build-lib/">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<!-- The dynamo class path -->
+	<path id="dynamo.classpath">
+		<fileset dir="${dynamo.home}/../DAS/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dynamo.home}/../DAS-UI/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dynamo.home}/../DPS/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dynamo.home}/../DSS/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${dynamo.home}/../DCS/lib">
+			<include name="**/*.jar" />
+		</fileset>
+
+	</path>
+
+	<!-- Other things to watch for in the classpath -->
+	<patternset id="resource.files">
+		<include name="**/*.properties" />
+		<include name="**/*.xml" />
+		<include name="**/*.dtd" />
+	</patternset>
+
+	<target name="build-module" depends="-init, -createdirs">
+		<echo message="Building module ${module.dir}." />
+
+		<property name="module.install.dir" value="${dynamo.root.dir}/${module.dir}" />
+		<!-- Create the ATG module directory -->
+		<mkdir dir="${module.install.dir}" />
+
+		<!-- all modules need a manifest -->
+		<mkdir dir="${module.install.dir}/META-INF" />
+		<copy todir="${module.install.dir}/META-INF" file="META-INF/MANIFEST.MF" />
+
+		<!-- if this module has Java source -->
+		<available file="src" type="dir" property="module.has.source" />
+		<if name="module.has.source" value="true">
+			<!-- Compile the code for the module -->
+			<javac srcdir="src" destdir="build/${module.dir}/classes" debug="true" deprecation="false" optimize="false" verbose="${javac.verbose.bool}">
+				<classpath path="${classpath}" />
+				<classpath refid="lib.classpath" />
+				<classpath refid="dynamo.classpath" />
+				<include name="**/*.java" />
+			</javac>
+			<!-- copy Java resource files to build directory -->
+			<copy todir="build/${module.dir}/classes">
+				<fileset dir="src/">
+					<patternset refid="resource.files" />
+				</fileset>
+			</copy>
+		</if>
+
+		<!-- if this module has libraries -->
+		<available file="lib" type="dir" property="module.has.lib" />
+		<if name="module.has.lib" value="true">
+			<mkdir dir="${module.install.dir}/lib" />
+			<copy todir="${module.install.dir}/lib">
+				<fileset dir="lib" />
+			</copy>
+		</if>
+
+		<!-- if this module has classes -->
+		<available file="build/${module.dir}/classes" type="dir" property="module.has.classes" />
+		<if name="module.has.classes" value="true">
+			<mkdir dir="${module.install.dir}/classes" />
+			<copy todir="${module.install.dir}/classes">
+				<fileset dir="build/${module.dir}/classes" />
+			</copy>
+		</if>
+
+		<!-- if this module has config -->
+		<available file="config" type="dir" property="module.has.config" />
+		<if name="module.has.config" value="true">
+			<mkdir dir="${module.install.dir}/config" />
+			<copy todir="${module.install.dir}/config">
+				<fileset dir="config" />
+			</copy>
+		</if>
+
+		<!-- if this module has liveconfig -->
+		<available file="liveconfig" type="dir" property="module.has.liveconfig" />
+		<if name="module.has.liveconfig" value="true">
+			<mkdir dir="${module.install.dir}/liveconfig" />
+			<copy todir="${module.install.dir}/liveconfig" failonerror="false">
+				<fileset dir="liveconfig" />
+			</copy>
+		</if>
+
+		<!-- if this module has web apps -->
+		<available file="j2ee-apps" type="dir" property="module.has.webapps" />
+		<if name="module.has.webapps" value="true">
+			<mkdir dir="${module.install.dir}/j2ee-apps" />
+			<copy todir="${module.install.dir}/j2ee-apps">
+				<fileset dir="j2ee-apps" />
+			</copy>
+		</if>
+
+		<mkdir dir="${module.install.dir}/sql" />
+		<copy todir="${module.install.dir}/sql">
+			<fileset dir="sql" />
+		</copy>
+
+		<mkdir dir="${module.install.dir}/documentation" />
+		<copy todir="${module.install.dir}/documentation">
+			<fileset dir="documentation" />
+		</copy>
+
+		<copy todir="${module.install.dir}/">
+			<fileset file="jboss-bouncycastle-module.tgz" />
+		</copy>
+		<echo message="Module ${module.dir} built." />
+	</target>
+
+
+	<target name="build-all-modules" depends="build-module">
+		<ant antfile="build.xml" dir="TOOLS" inheritall="false" />
+		<ant antfile="build.xml" dir="B2CCommerce" inheritall="false" />
+	</target>
+
+	<!-- Deletes the build directories. -->
+	<target name="clean" depends="-init" description="Deletes the contents of the build directories.">
+		<echo message="Deleting:" />
+		<echo message="  build" />
+		<delete failonerror="false" includeEmptyDirs="true">
+			<fileset dir="build" />
+		</delete>
+		<ant antfile="build.xml" dir="TOOLS" inheritall="false" target="clean" />
+	</target>
+
+	<!-- Creates the javadocs for the project.  This is an expensive operation. -->
+	<target name="javadoc" depends="-init" description="Builds the javadoc.">
+		<mkdir dir="documentation/javadoc" />
+		<javadoc destdir="documentation/javadoc" author="true" version="true" use="true">
+			<packageset dir="src" defaultexcludes="yes">
+				<include name="**" />
+			</packageset>
+			<packageset dir="TOOLS/src" defaultexcludes="yes">
+				<include name="**" />
+			</packageset>
+			<classpath path="${classpath}" />
+			<classpath refid="lib.classpath" />
+			<classpath refid="dynamo.classpath" />
+			<link offline="true" href="http://java.sun.com/j2se/1.5.0/docs/api/" packagelistLoc="${jdk.docs.dir}" />
+			<link offline="true" href="http://www.atg.com/repositories/ContentCatalogRepository_en/manuals/ATG9.1/apidoc/" packagelistLoc="${dynamo.docs.dir}" />
+		</javadoc>
+	</target>
+
+	<!-- This target uses the runAssembler command to build the assembled ear and deploy it to JBoss. -->
+
+
+	<!-- Create the directories used in the build process. Not intended to be used publically. -->
+	<target name="-createdirs">
+		<mkdir dir="build/${module.dir}/classes" />
+	</target>
+
+	<!-- Initializes the build.  This target is not public, but should be called by all the others.	-->
+	<target name="-init">
+		<!-- Create the timestamp -->
+		<tstamp />
+		<echo message="" />
+		<echo message="" />
+		<echo message="#############################################################################" />
+		<echo message="#############################################################################" />
+		<echo message="${module.dir}: start date = ${DSTAMP}  start time = ${TSTAMP}" />
+		<echo message="JAVA_HOME       = ${env.JAVA_HOME}" />
+		<echo message="dynamo.home     = ${dynamo.home}" />
+		<echo message="dynamo.root.dir = ${dynamo.root.dir}" />
+		<echo message="jboss.home      = ${jboss.home}" />
+		<echo message="#############################################################################" />
+		<echo message="#############################################################################" />
+		<echo message="" />
+		<echo message="" />
+		<mkdir dir="build" />
+		<mkdir dir="build/classes" />
+	</target>
+
+	<target name="report" depends="checkstyle, pmd" />
+
+	<!-- Generates a Checkstyle report -->
+	<target name="checkstyle">
+		<mkdir dir="gen/reports/checkstyle" />
+		<taskdef resource="checkstyletask.properties" classpath="buildlib/checkstyle-all-4.4.jar" />
+		<checkstyle config="atg-checks.xml" failonviolation="false">
+			<classpath path="${classpath}" />
+			<classpath refid="lib.classpath" />
+			<classpath refid="dynamo.classpath" />
+			<fileset dir="src">
+				<include name="**/*.java" />
+			</fileset>
+			<formatter type="xml" toFile="gen/reports/checkstyle/checkstyle.xml" />
+		</checkstyle>
+	</target>
+
+	<target name="pmd">
+		<mkdir dir="gen/reports/pmd" />
+		<taskdef name="pmd" classname="net.sourceforge.pmd.ant.PMDTask" classpathref="buildlib.classpath" />
+		<pmd targetjdk="1.4">
+			<ruleset>basic</ruleset>
+			<formatter type="html" toFile="gen/reports/pmd/pmd_report.html" />
+			<formatter type="xml" toFile="gen/reports/pmd/pmd_report.xml" />
+			<fileset dir="src">
+				<include name="**/*.java" />
+			</fileset>
+		</pmd>
+	</target>
+
+	<target name="cpd">
+		<mkdir dir="gen/reports/cpd" />
+		<taskdef name="cpd" classname="net.sourceforge.pmd.cpd.CPDTask" classpathref="buildlib.classpath" />
+		<cpd minimumTokenCount="100" outputFile="gen/reports/cpd/cpd.xml">
+			<fileset dir="src">
+				<include name="**/*.java" />
+			</fileset>
+		</cpd>
+	</target>
+
+	<target name="findbugs">
+		<mkdir dir="gen/reports/findbugs" />
+		<taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask" classpathref="buildlib.classpath" />
+		<findbugs home="${findbugs.home}" output="xml" outputFile="gen/reports/findbugs/findbugs.xml">
+			<auxClasspath refid="dynamo.classpath" />
+			<auxClasspath refid="lib.classpath" />
+			<auxClasspath refid="buildlib.classpath" />
+			<sourcePath path="src" />
+			<class location="classes" />
+		</findbugs>
+	</target>
+
+	<target name="runJunitEETests">
+		<waitfor maxwait="5" maxwaitunit="minute" checkevery="1000">
+			<http url="http://localhost:8080/smg" />
+		</waitfor>
+		<taskdef name="junitee" classname="org.junitee.anttask.JUnitEETask" classpathref="buildlib.classpath" />
+		<junitee url="http://localhost:8840/test/TestServlet" printsummary="true" threaded="false">
+			<test runall="true" />
+		</junitee>
+	</target>
+
+	<target name="runJMeterTests">
+		<mkdir dir="gen/reports/jmeter" />
+		<taskdef name="jmeter" classname="org.programmerplanet.ant.taskdefs.jmeter.JMeterTask" classpathref="buildlib.classpath" />
+		<jmeter jmeterhome="${jmeter.home}" testplan="TEST/j2ee-apps/test.war/jmeter/prodScottsTestPlan.jmx" resultlog="gen/reports/jmeter/JMeterResults.jtl">
+			<property name="jmeter.save.saveservice.assertion_results" value="all" />
+			<property name="jmeter.save.saveservice.output_format" value="xml" />
+		</jmeter>
+		<xslt in="gen/reports/jmeter/JMeterResults.jtl" out="gen/reports/jmeter/JMeterResults.html" style="TEST/j2ee-apps/test.war/jmeter/jmeter-results-detail-report.xsl" />
+	</target>
+</project>
