@@ -16,3 +16,7 @@ The Spark::red PCI Compliance ATG  Encryption Module (Crypto Module) covers all 
 
 
 ATG stores credit cards in two places by default: an order paid for with a credit card will store the credit card information with the order, and a user’s profile can have one or more saved credit cards associated with it. Unfortunately by default ATG stores these credit cards in plain text, unencrypted. This is obviously not PCI compliant. ATG’s new Commerce Reference Store (CRS) provides encryption for the user profile’s stored credit cards, but not the order’s payment credit card. The encryption is also far less secure than our module, and does not meet PCI requirements for key management and provides no ability for key rotation and re-encryption.
+
+
+## Provided by Spark::red - Managed Oracle Commerce Hosting
+https://www.sparkred.com
